@@ -43,6 +43,24 @@ This is an ORM starter application for [Angel3 framework](https://angel3-framewo
 
 2. Modify the code and watch the changes applied to the application
 
+3. Insert into DB:
+
+    ```
+    curl -H "Content-Type: application/json" -X POST -d '{"message":"OK_Message" }' "http://localhost:3000/greetings/"
+    ```
+
+    or
+
+    ```
+    curl -X POST -d 'message=OK_Message22' "http://localhost:3000/greetings/"
+    ```
+
+4. Query DB:
+
+    ```
+    http://localhost:3000/greetings/
+    ```
+
 ### Production
 
 1. Run the following command:

@@ -1,5 +1,5 @@
 import 'package:angel_app1/angel_app1.dart';
-import 'package:angel3_container/mirrors.dart';
+// import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_production/angel3_production.dart';
 
 // NOTE: By default, the Runner class does not use the `MirrorsReflector`, or any
@@ -26,5 +26,5 @@ import 'package:angel3_production/angel3_production.dart';
 //
 // https://gitter.im/angel_dart/discussion
 void main(List<String> args) =>
-    Runner('angel_app1', configureServer, reflector: MirrorsReflector())
-        .run(args);
+    // Runner('angel_app1', configureServer, reflector: MirrorsReflector())
+    Runner('angel_app1', configureServer).run(args);

@@ -2,6 +2,11 @@
 ### Dart template
 # See https://www.dartlang.org/tools/private-files.html
 
+bin/*.exe
+bin/*.reflectable.dart
+
+test/*.reflectable.dart
+
 # source_gen
 .dart_tool
 

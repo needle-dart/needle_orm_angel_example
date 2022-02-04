@@ -23,6 +23,7 @@ dev_dependencies:
   angel3_hot: ^4.2.0
   angel3_migration_runner: ^4.0.0
   angel3_orm_generator: ^4.1.0
+  angel3_container_generator: ^3.0.1
   angel3_serialize_generator: ^4.2.0
   angel3_test: ^4.0.0
   build_runner: ^2.0.3

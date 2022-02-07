@@ -2,8 +2,26 @@ import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_orm/angel3_orm.dart';
 import 'package:angel3_static/angel3_static.dart';
 import 'package:file/file.dart';
+import 'package:needle_orm/needle_orm.dart';
+import 'package:scope/scope.dart';
+import '../constants.dart';
 import 'controllers/controllers.dart' as controllers;
-import '../models/greeting.dart';
+import '../models/greeting.dart' hide Book;
+import '../model2/domain.dart';
+
+class QueryExecutorDataSource extends DataSource {
+  final QueryExecutor queryExecutor;
+  QueryExecutorDataSource(this.queryExecutor)
+      : super(DatabaseType.PostgreSQL, "10.0");
+
+  @override
+  Future<List<List>> execute(
+      String tableName, String sql, Map<String, dynamic> substitutionValues,
+      [List<String> returningFields = const []]) {
+    return queryExecutor.query(
+        tableName, sql, substitutionValues, returningFields);
+  }
+}
 
 /// Put your app routes here!
 ///
@@ -24,12 +42,12 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
       return query.get(executor);
     });
 
-    app.get('/books', (req, res) {
+/*     app.get('/books', (req, res) {
       var executor = req.container!.make<QueryExecutor>();
       var query = BookQuery();
       return query.get(executor);
     });
-
+ */
     app.post('/greetings', (req, res) async {
       await req.parseBody();
 
@@ -38,7 +56,9 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
       } else {
         var executor = req.container!.make<QueryExecutor>();
         var message = req.bodyAsMap['message'].toString();
-        var query = GreetingQuery()..values.message = message;
+        var query = GreetingQuery()
+          ..values.message = message
+          ..values.createdAt = null;
         var optional = await query.insert(executor);
         return optional.value;
       }
@@ -47,18 +67,21 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
     app.post('/books', (req, res) async {
       await req.parseBody();
 
-      if (!req.bodyAsMap.containsKey('name')) {
-        throw AngelHttpException.badRequest(message: 'Missing "name".');
-      } else {
-        var executor = req.container!.make<QueryExecutor>();
-        var name = req.bodyAsMap['name'].toString();
-        var price = double.tryParse(req.bodyAsMap['price'].toString());
-        var query = BookQuery()
-          ..values.name = name
-          ..values.price = price;
-        var optional = await query.insert(executor);
-        return optional.value;
-      }
+      var executor = req.container!.make<QueryExecutor>();
+      var map = req.bodyAsMap;
+
+      print('need validate map here.');
+
+      var ds = QueryExecutorDataSource(executor);
+
+      // use Scope to inject a QueryExecutor into current context
+      var book =
+          (Scope()..value<DataSource>(scopeKeyDataSource, ds)).run(() => Book()
+            ..loadMap(map)
+            ..insert()); // insert will lookup a QueryExecutor
+
+      print('isDartBook? ${book.isDartBook()}');
+      return book.toMap();
     });
 
     app.get('/greetings/:message', (req, res) {

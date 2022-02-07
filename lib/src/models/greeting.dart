@@ -13,10 +13,12 @@ abstract class _Greeting extends Model {
 
 @serializable
 @orm
-abstract class _Book extends Model {
-  @SerializableField(isNullable: false)
-  String? get name;
+class _Book extends Model {
+  @Column()
+  String? _name;
 
-  @SerializableField(isNullable: false)
-  double? get price;
+  @Column()
+  double? _price;
+
+  _Book();
 }

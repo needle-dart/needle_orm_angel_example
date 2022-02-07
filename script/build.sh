@@ -1,0 +1,1 @@
+dart compile exe bin/prod.dart

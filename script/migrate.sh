@@ -1,0 +1,1 @@
+dart bin/migrate.dart up

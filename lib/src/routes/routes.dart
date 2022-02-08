@@ -85,6 +85,27 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
       return book.toMap();
     });
 
+    app.put('/books/:id', (req, res) async {
+      await req.parseBody();
+
+      var id = int.tryParse(req.params['id']);
+      var executor = req.container!.make<QueryExecutor>();
+      var map = req.bodyAsMap;
+
+      print('need validate map here.');
+
+      var ds = QueryExecutorDataSource(executor);
+
+      // use Scope to inject a QueryExecutor into current context
+      var book =
+          (Scope()..value<DataSource>(scopeKeyDataSource, ds)).run(() => Book()
+            ..loadMap(map)
+            ..id = id
+            ..update()); // insert will lookup a QueryExecutor
+
+      return book.toMap();
+    });
+
     app.get('/greetings/:message', (req, res) {
       var message = req.params['message'] as String;
       var executor = req.container!.make<QueryExecutor>();

@@ -23,6 +23,12 @@ class QueryExecutorDataSource extends DataSource {
   }
 }
 
+R runWithDs<R>(RequestContext<dynamic> req, R Function() func) {
+  var executor = req.container!.make<QueryExecutor>();
+  var ds = QueryExecutorDataSource(executor);
+  return (Scope()..value<DataSource>(scopeKeyDataSource, ds)).run(func);
+}
+
 /// Put your app routes here!
 ///
 /// See the wiki for information about routing, requests, and responses:
@@ -104,6 +110,20 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
             ..update()); // insert will lookup a QueryExecutor
 
       return book.toMap();
+    });
+
+    app.get('/books/:id', (req, res) {
+      var id = int.tryParse(req.params['id'])!;
+      var book = runWithDs(req, () => Book.Query.findById(id));
+      return book?.toMap();
+    });
+
+    app.get('/books', (req, res) {
+      var books = runWithDs(req, () {
+        Book.Query.test();
+        return Book.Query.findAll();
+      });
+      return books;
     });
 
     app.get('/greetings/:message', (req, res) {

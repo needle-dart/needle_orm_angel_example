@@ -19,3 +19,9 @@ extension BizBook on Book {
     print('after insert book ....');
   }
 }
+
+extension BookQueryExt on BookModelQuery {
+  void test() {
+    print('test query extension');
+  }
+}

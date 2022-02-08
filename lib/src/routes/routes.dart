@@ -58,7 +58,8 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
         var message = req.bodyAsMap['message'].toString();
         var query = GreetingQuery()
           ..values.message = message
-          ..values.createdAt = null;
+          ..values.createdAt =
+              null; // createdAt will not be saved without this line.
         var optional = await query.insert(executor);
         return optional.value;
       }

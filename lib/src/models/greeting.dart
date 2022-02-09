@@ -10,15 +10,3 @@ abstract class _Greeting extends Model {
   @SerializableField(isNullable: false)
   String? get message;
 }
-
-@serializable
-@orm
-class _Book extends Model {
-  @Column()
-  String? _name;
-
-  @Column()
-  double? _price;
-
-  _Book();
-}

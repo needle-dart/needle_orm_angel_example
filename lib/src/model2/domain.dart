@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field, unused_element
 
+import 'package:angel3_migration/angel3_migration.dart';
 import 'package:angel_app1/src/constants.dart';
 import 'package:needle_orm/needle_orm.dart';
 import 'package:needle_orm/spi.dart';
@@ -46,7 +47,7 @@ abstract class _BaseModel {
   _BaseModel();
 }
 
-@Table()
+// @Table()
 @Entity(prePersist: 'beforeInsert', postPersist: 'afterInsert')
 class _Book extends _BaseModel {
   @Column()
@@ -61,7 +62,7 @@ class _Book extends _BaseModel {
   _Book();
 }
 
-@Table(name: 'tbl_user')
+// @Table(name: 'tbl_user')
 @Entity()
 class _User extends _BaseModel {
   @Column()

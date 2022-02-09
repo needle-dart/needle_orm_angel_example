@@ -47,7 +47,9 @@ This is an ORM starter application for [Angel3 framework](https://angel3-framewo
 
     ```
     curl -H "Content-Type: application/json" -X POST -d '{"message":"OK_Message" }' "http://localhost:3000/greetings/"
-    curl -H "Content-Type: application/json" -X POST -d '{"title":"Dart" }' "http://localhost:3000/books/"
+
+    curl -H "Content-Type: application/json" -X POST -d '{"name":"Dart","price":12.34 }' "http://localhost:3000/books/"
+    curl -H "Content-Type: application/json" -X PUT -d '{"name":"Dart222","price":99.34 }' "http://localhost:3000/books/1"
     ```
 
     or

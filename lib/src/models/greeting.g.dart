@@ -23,22 +23,6 @@ class GreetingMigration extends Migration {
   }
 }
 
-class BookMigration extends Migration {
-  @override
-  void up(Schema schema) {
-    schema.create('books', (table) {
-      table.serial('id').primaryKey();
-      table.timeStamp('created_at');
-      table.timeStamp('updated_at');
-    });
-  }
-
-  @override
-  void down(Schema schema) {
-    schema.drop('books');
-  }
-}
-
 // **************************************************************************
 // OrmGenerator
 // **************************************************************************
@@ -163,116 +147,6 @@ class GreetingQueryValues extends MapQueryValues {
   }
 }
 
-class BookQuery extends Query<Book, BookQueryWhere> {
-  BookQuery({Query? parent, Set<String>? trampoline}) : super(parent: parent) {
-    trampoline ??= <String>{};
-    trampoline.add(tableName);
-    _where = BookQueryWhere(this);
-  }
-
-  @override
-  final BookQueryValues values = BookQueryValues();
-
-  List<String> _selectedFields = [];
-
-  BookQueryWhere? _where;
-
-  @override
-  Map<String, String> get casts {
-    return {};
-  }
-
-  @override
-  String get tableName {
-    return 'books';
-  }
-
-  @override
-  List<String> get fields {
-    const _fields = ['id', 'created_at', 'updated_at'];
-    return _selectedFields.isEmpty
-        ? _fields
-        : _fields.where((field) => _selectedFields.contains(field)).toList();
-  }
-
-  BookQuery select(List<String> selectedFields) {
-    _selectedFields = selectedFields;
-    return this;
-  }
-
-  @override
-  BookQueryWhere? get where {
-    return _where;
-  }
-
-  @override
-  BookQueryWhere newWhereClause() {
-    return BookQueryWhere(this);
-  }
-
-  Optional<Book> parseRow(List row) {
-    if (row.every((x) => x == null)) {
-      return Optional.empty();
-    }
-    var model = Book(
-        id: fields.contains('id') ? row[0].toString() : null,
-        createdAt: fields.contains('created_at') ? (row[1] as DateTime?) : null,
-        updatedAt:
-            fields.contains('updated_at') ? (row[2] as DateTime?) : null);
-    return Optional.of(model);
-  }
-
-  @override
-  Optional<Book> deserialize(List row) {
-    return parseRow(row);
-  }
-}
-
-class BookQueryWhere extends QueryWhere {
-  BookQueryWhere(BookQuery query)
-      : id = NumericSqlExpressionBuilder<int>(query, 'id'),
-        createdAt = DateTimeSqlExpressionBuilder(query, 'created_at'),
-        updatedAt = DateTimeSqlExpressionBuilder(query, 'updated_at');
-
-  final NumericSqlExpressionBuilder<int> id;
-
-  final DateTimeSqlExpressionBuilder createdAt;
-
-  final DateTimeSqlExpressionBuilder updatedAt;
-
-  @override
-  List<SqlExpressionBuilder> get expressionBuilders {
-    return [id, createdAt, updatedAt];
-  }
-}
-
-class BookQueryValues extends MapQueryValues {
-  @override
-  Map<String, String> get casts {
-    return {};
-  }
-
-  String? get id {
-    return (values['id'] as String?);
-  }
-
-  set id(String? value) => values['id'] = value;
-  DateTime? get createdAt {
-    return (values['created_at'] as DateTime?);
-  }
-
-  set createdAt(DateTime? value) => values['created_at'] = value;
-  DateTime? get updatedAt {
-    return (values['updated_at'] as DateTime?);
-  }
-
-  set updatedAt(DateTime? value) => values['updated_at'] = value;
-  void copyFrom(Book model) {
-    createdAt = model.createdAt;
-    updatedAt = model.updatedAt;
-  }
-}
-
 // **************************************************************************
 // JsonModelGenerator
 // **************************************************************************
@@ -326,52 +200,6 @@ class Greeting extends _Greeting {
 
   Map<String, dynamic> toJson() {
     return GreetingSerializer.toMap(this);
-  }
-}
-
-@generatedSerializable
-class Book extends _Book {
-  Book({this.id, this.createdAt, this.updatedAt});
-
-  /// A unique identifier corresponding to this item.
-  @override
-  String? id;
-
-  /// The time at which this item was created.
-  @override
-  DateTime? createdAt;
-
-  /// The last time at which this item was updated.
-  @override
-  DateTime? updatedAt;
-
-  Book copyWith({String? id, DateTime? createdAt, DateTime? updatedAt}) {
-    return Book(
-        id: id ?? this.id,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt);
-  }
-
-  @override
-  bool operator ==(other) {
-    return other is _Book &&
-        other.id == id &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
-  }
-
-  @override
-  int get hashCode {
-    return hashObjects([id, createdAt, updatedAt]);
-  }
-
-  @override
-  String toString() {
-    return 'Book(id=$id, createdAt=$createdAt, updatedAt=$updatedAt)';
-  }
-
-  Map<String, dynamic> toJson() {
-    return BookSerializer.toMap(this);
   }
 }
 
@@ -450,64 +278,4 @@ abstract class GreetingFields {
   static const String updatedAt = 'updated_at';
 
   static const String message = 'message';
-}
-
-const BookSerializer bookSerializer = BookSerializer();
-
-class BookEncoder extends Converter<Book, Map> {
-  const BookEncoder();
-
-  @override
-  Map convert(Book model) => BookSerializer.toMap(model);
-}
-
-class BookDecoder extends Converter<Map, Book> {
-  const BookDecoder();
-
-  @override
-  Book convert(Map map) => BookSerializer.fromMap(map);
-}
-
-class BookSerializer extends Codec<Book, Map> {
-  const BookSerializer();
-
-  @override
-  BookEncoder get encoder => const BookEncoder();
-  @override
-  BookDecoder get decoder => const BookDecoder();
-  static Book fromMap(Map map) {
-    return Book(
-        id: map['id'] as String?,
-        createdAt: map['created_at'] != null
-            ? (map['created_at'] is DateTime
-                ? (map['created_at'] as DateTime)
-                : DateTime.parse(map['created_at'].toString()))
-            : null,
-        updatedAt: map['updated_at'] != null
-            ? (map['updated_at'] is DateTime
-                ? (map['updated_at'] as DateTime)
-                : DateTime.parse(map['updated_at'].toString()))
-            : null);
-  }
-
-  static Map<String, dynamic> toMap(_Book? model) {
-    if (model == null) {
-      return {};
-    }
-    return {
-      'id': model.id,
-      'created_at': model.createdAt?.toIso8601String(),
-      'updated_at': model.updatedAt?.toIso8601String()
-    };
-  }
-}
-
-abstract class BookFields {
-  static const List<String> allFields = <String>[id, createdAt, updatedAt];
-
-  static const String id = 'id';
-
-  static const String createdAt = 'created_at';
-
-  static const String updatedAt = 'updated_at';
 }

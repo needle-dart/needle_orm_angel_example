@@ -195,7 +195,6 @@ class OrmMetaInfoBook extends OrmMetaInfoClass {
             isAbstract: false,
             superClassName: 'BaseModel',
             ormAnnotations: [
-              Table(),
               Entity(prePersist: 'beforeInsert', postPersist: 'afterInsert'),
             ],
             fields: [
@@ -205,7 +204,7 @@ class OrmMetaInfoBook extends OrmMetaInfoClass {
               OrmMetaInfoField('price', 'double?', ormAnnotations: [
                 Column(),
               ]),
-              OrmMetaInfoField('author', '_User?', ormAnnotations: [
+              OrmMetaInfoField('author', 'User?', ormAnnotations: [
                 ManyToOne(),
               ]),
             ]);
@@ -217,7 +216,6 @@ class OrmMetaInfoUser extends OrmMetaInfoClass {
             isAbstract: false,
             superClassName: 'BaseModel',
             ormAnnotations: [
-              Table(name: 'tbl_user'),
               Entity(),
             ],
             fields: [
@@ -398,8 +396,8 @@ abstract class BaseModel extends __Model {
       "id": _id,
       "version": _version,
       "deleted": _deleted,
-      "createdAt": _createdAt,
-      "updatedAt": _updatedAt,
+      "createdAt": _createdAt?.toIso8601String(),
+      "updatedAt": _updatedAt?.toIso8601String(),
       "createdBy": _createdBy,
       "lastUpdatedBy": _lastUpdatedBy,
       "remark": _remark,
@@ -678,5 +676,109 @@ class Job extends BaseModel {
   @override
   String? get __idFieldName {
     return "id";
+  }
+}
+
+// **************************************************************************
+// NeedleOrmMigrationGenerator
+// **************************************************************************
+
+class BookMigration extends Migration {
+  @override
+  void up(Schema schema) {
+    schema.create('books', (table) {
+      table.varChar('name');
+
+      table.float('price');
+
+      table.varChar('author');
+
+      table.serial('id');
+
+      table.integer('version');
+
+      table.boolean('deleted');
+
+      table.timeStamp('created_at');
+
+      table.timeStamp('updated_at');
+
+      table.varChar('created_by');
+
+      table.varChar('last_updated_by');
+
+      table.varChar('remark');
+    });
+  }
+
+  @override
+  void down(Schema schema) {
+    schema.drop('books');
+  }
+}
+
+class UserMigration extends Migration {
+  @override
+  void up(Schema schema) {
+    schema.create('users', (table) {
+      table.varChar('name');
+
+      table.varChar('login_name');
+
+      table.varChar('address');
+
+      table.integer('age');
+
+      table.serial('id');
+
+      table.integer('version');
+
+      table.boolean('deleted');
+
+      table.timeStamp('created_at');
+
+      table.timeStamp('updated_at');
+
+      table.varChar('created_by');
+
+      table.varChar('last_updated_by');
+
+      table.varChar('remark');
+    });
+  }
+
+  @override
+  void down(Schema schema) {
+    schema.drop('users');
+  }
+}
+
+class JobMigration extends Migration {
+  @override
+  void up(Schema schema) {
+    schema.create('jobs', (table) {
+      table.varChar('name');
+
+      table.serial('id');
+
+      table.integer('version');
+
+      table.boolean('deleted');
+
+      table.timeStamp('created_at');
+
+      table.timeStamp('updated_at');
+
+      table.varChar('created_by');
+
+      table.varChar('last_updated_by');
+
+      table.varChar('remark');
+    });
+  }
+
+  @override
+  void down(Schema schema) {
+    schema.drop('jobs');
   }
 }

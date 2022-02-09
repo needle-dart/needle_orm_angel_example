@@ -8,6 +8,7 @@ import '../constants.dart';
 import 'controllers/controllers.dart' as controllers;
 import '../models/greeting.dart' hide Book;
 import '../model2/domain.dart';
+import 'dart:io' as io;
 
 class QueryExecutorDataSource extends DataSource {
   final QueryExecutor queryExecutor;
@@ -41,6 +42,8 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
 
     // Render `views/hello.jl` when a user visits the application root.
     app.get('/', (req, res) => res.render('hello'));
+
+    app.get('/quit', (req, res) => io.exit(0));
 
     app.get('/greetings', (req, res) {
       var executor = req.container!.make<QueryExecutor>();
@@ -112,18 +115,20 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
       return book.toMap();
     });
 
-    app.get('/books/:id', (req, res) {
+    app.get('/books/:id', (req, res) async {
       var id = int.tryParse(req.params['id'])!;
-      var book = runWithDs(req, () => Book.Query.findById(id));
-      return book?.toMap();
+      var book = await runWithDs(req, () => Book.Query.findById(id));
+      var json = book?.toMap()?..removeWhere((key, value) => value == null);
+      print('book: $json');
+      return json;
     });
 
-    app.get('/books', (req, res) {
-      var books = runWithDs(req, () {
-        Book.Query.test();
+    app.get('/books', (req, res) async {
+      var books = await runWithDs(req, () {
+        // Book.Query.test();
         return Book.Query.findAll();
       });
-      return books;
+      return books.map((e) => e.toMap()).toList();
     });
 
     app.get('/greetings/:message', (req, res) {

@@ -14,8 +14,7 @@ part 'domain.part.dart'; // business logic code
 
 //__Model will be generated in .g.dart
 
-// .g.dart needs 'sqlExecutor' & scopeKeyDefaultDs ; class _SqlExecutor is genereated in .g.dart
-final sqlExecutor = _SqlExecutor();
+// .g.dart needs scopeKeyDefaultDs
 final scopeKeyDefaultDs = scopeKeyDataSource;
 
 @Entity()

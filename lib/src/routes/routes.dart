@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_orm/angel3_orm.dart';
 import 'package:angel3_static/angel3_static.dart';
@@ -22,6 +24,10 @@ class QueryExecutorDataSource extends DataSource {
     return queryExecutor.query(
         tableName, sql, substitutionValues, returningFields);
   }
+
+  Future<T> transaction<T>(FutureOr<T> Function(QueryExecutorDataSource) f) {
+    return queryExecutor.transaction((p0) => f(this));
+  }
 }
 
 R runWithDs<R>(RequestContext<dynamic> req, R Function() func) {
@@ -42,6 +48,10 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
 
     // Render `views/hello.jl` when a user visits the application root.
     app.get('/', (req, res) => res.render('hello'));
+    app.get('/hello', (req, res) async {
+      res.write('hello');
+      res.close();
+    });
 
     app.get('/quit', (req, res) => io.exit(0));
 
@@ -129,6 +139,33 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
         return Book.Query.findAll();
       });
       return books.map((e) => e.toMap()).toList();
+    });
+
+    app.get('/booktest1', (req, res) async {
+      var books = await runWithDs(req, () {
+        return Book.Query.findAll();
+      });
+      return books.map((b) => b.toMap()).toList();
+    });
+
+    app.get('/booktest2', (req, res) async {
+      return await runWithDs(req, () {
+        return [
+          (Book()
+                ..name = 'Name'
+                ..price = 12.34)
+              .toMap()
+        ];
+      });
+    });
+
+    app.get('/booktest3', (req, res) async {
+      return [
+        (Book()
+              ..name = 'Name'
+              ..price = 12.34)
+            .toMap()
+      ];
     });
 
     app.get('/greetings/:message', (req, res) {

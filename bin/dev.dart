@@ -8,7 +8,7 @@ import 'package:angel3_hot/angel3_hot.dart';
 import 'package:logging/logging.dart';
 
 void main() async {
-  test();
+  // test();
   // Watch the config/ and web/ directories for changes, and hot-reload the server.
   hierarchicalLoggingEnabled = true;
 

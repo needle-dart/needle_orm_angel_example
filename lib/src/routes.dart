@@ -6,11 +6,8 @@ import 'package:angel3_static/angel3_static.dart';
 import 'package:file/file.dart';
 import 'package:needle_orm/needle_orm.dart';
 import 'package:scope/scope.dart';
-import '../constants.dart';
-import 'controllers/controllers.dart' as controllers;
-import '../models/greeting.dart' hide Book;
-import '../model2/domain.dart';
-import 'dart:io' as io;
+import 'constants.dart';
+import 'domain.dart';
 
 class QueryExecutorDataSource extends DataSource {
   final QueryExecutor queryExecutor;
@@ -43,47 +40,6 @@ R runWithDs<R>(RequestContext<dynamic> req, R Function() func) {
 /// * https://angel3-docs.dukefirehawk.com/guides/requests-and-responses
 AngelConfigurer configureServer(FileSystem fileSystem) {
   return (Angel app) async {
-    // Typically, you want to mount controllers first, after any global middleware.
-    await app.configure(controllers.configureServer);
-
-    // Render `views/hello.jl` when a user visits the application root.
-    app.get('/', (req, res) => res.render('hello'));
-    app.get('/hello', (req, res) async {
-      res.write('hello');
-      res.close();
-    });
-
-    app.get('/quit', (req, res) => io.exit(0));
-
-    app.get('/greetings', (req, res) {
-      var executor = req.container!.make<QueryExecutor>();
-      var query = GreetingQuery();
-      return query.get(executor);
-    });
-
-/*     app.get('/books', (req, res) {
-      var executor = req.container!.make<QueryExecutor>();
-      var query = BookQuery();
-      return query.get(executor);
-    });
- */
-    app.post('/greetings', (req, res) async {
-      await req.parseBody();
-
-      if (!req.bodyAsMap.containsKey('message')) {
-        throw AngelHttpException.badRequest(message: 'Missing "message".');
-      } else {
-        var executor = req.container!.make<QueryExecutor>();
-        var message = req.bodyAsMap['message'].toString();
-        var query = GreetingQuery()
-          ..values.message = message
-          ..values.createdAt =
-              null; // createdAt will not be saved without this line.
-        var optional = await query.insert(executor);
-        return optional.value;
-      }
-    });
-
     app.post('/books', (req, res) async {
       await req.parseBody();
 
@@ -135,17 +91,9 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
 
     app.get('/books', (req, res) async {
       var books = await runWithDs(req, () {
-        // Book.Query.test();
         return Book.Query.findAll();
       });
       return books.map((e) => e.toMap()).toList();
-    });
-
-    app.get('/booktest1', (req, res) async {
-      var books = await runWithDs(req, () {
-        return Book.Query.findAll();
-      });
-      return books.map((b) => b.toMap()).toList();
     });
 
     app.get('/booktest2', (req, res) async {
@@ -166,13 +114,6 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
               ..price = 12.34)
             .toMap()
       ];
-    });
-
-    app.get('/greetings/:message', (req, res) {
-      var message = req.params['message'] as String;
-      var executor = req.container!.make<QueryExecutor>();
-      var query = GreetingQuery()..where!.message.equals(message);
-      return query.get(executor);
     });
 
     // Mount static server at web in development.

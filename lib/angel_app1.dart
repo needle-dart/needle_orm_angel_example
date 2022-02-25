@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:file/local.dart';
 import 'src/config/config.dart' as configuration;
-import 'src/routes/routes.dart' as routes;
-import 'src/services/services.dart' as services;
+import 'src/routes.dart' as routes;
 
 /// Configures the server instance.
 Future configureServer(Angel app) async {
@@ -14,6 +13,5 @@ Future configureServer(Angel app) async {
 
   // Set up our application, using the plug-ins defined with this project.
   await app.configure(configuration.configureServer(fs));
-  await app.configure(services.configureServer);
   await app.configure(routes.configureServer(fs));
 }

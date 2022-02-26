@@ -1,4 +1,3 @@
-import 'package:angel_app1/angel_app1.dart';
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_test/angel3_test.dart';
 import 'package:test/test.dart';
@@ -24,8 +23,6 @@ void main() async {
 
   setUp(() async {
     var app = Angel();
-    await app.configure(configureServer);
-
     client = await connectTo(app);
   });
 

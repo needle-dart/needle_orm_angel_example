@@ -1,6 +1,7 @@
 import 'package:angel3_framework/angel3_framework.dart';
 import 'package:angel3_test/angel3_test.dart';
 import 'package:test/test.dart';
+import 'package:needle_orm_angel_example/angel_app1.dart';
 
 // Angel also includes facilities to make testing easier.
 //
@@ -23,6 +24,7 @@ void main() async {
 
   setUp(() async {
     var app = Angel();
+    await app.configure(configureServer);
     client = await connectTo(app);
   });
 
@@ -32,8 +34,9 @@ void main() async {
 
   test('index returns 200', () async {
     // Request a resource at the given path.
-    var response = await client.get(Uri.parse('/'));
+    var response = await client.get(Uri.parse('/books'));
 
+    print(response.body);
     // Expect a 200 response.
     expect(response, hasStatus(200));
   });

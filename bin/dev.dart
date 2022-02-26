@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:angel_app1/angel_app1.dart';
+import 'package:needle_orm_angel_example/angel_app1.dart';
 import 'package:belatuk_pretty_logging/belatuk_pretty_logging.dart';
 import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_framework/angel3_framework.dart';

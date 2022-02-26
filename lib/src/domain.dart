@@ -1,7 +1,7 @@
 // ignore_for_file: unused_field, unused_element
 
 import 'package:angel3_migration/angel3_migration.dart';
-import 'package:angel_app1/src/constants.dart';
+import './constants.dart';
 import 'package:needle_orm/needle_orm.dart';
 import 'package:needle_orm/spi.dart';
 import 'package:scope/scope.dart';

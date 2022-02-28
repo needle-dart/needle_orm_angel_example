@@ -1,4 +1,4 @@
-import 'package:angel_app1/angel_app1.dart';
+import 'package:needle_orm_angel_example/angel_app1.dart';
 // import 'package:angel3_container/mirrors.dart';
 import 'package:angel3_production/angel3_production.dart';
 

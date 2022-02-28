@@ -93,7 +93,20 @@ abstract class __Model extends Model {
 
 abstract class _BaseModelQuery<T extends __Model, D>
     extends BaseModelQuery<T, D> {
-  _BaseModelQuery() : super(sqlExecutor);
+  _BaseModelQuery({BaseModelQuery? topQuery})
+      : super(sqlExecutor, topQuery: topQuery);
+
+  BaseModelQuery createQuery(String name) {
+    switch (name) {
+      case 'Book':
+        return BookModelQuery(topQuery: this);
+      case 'User':
+        return UserModelQuery(topQuery: this);
+      case 'Job':
+        return JobModelQuery(topQuery: this);
+    }
+    throw 'Unknow Query Name: $name';
+  }
 }
 
 class _ModelInspector extends ModelInspector<__Model> {
@@ -287,6 +300,28 @@ final _allOrmClasses = [
 class BaseModelModelQuery extends _BaseModelQuery<BaseModel, int> {
   @override
   String get className => 'BaseModel';
+
+  BaseModelModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+
+  IntColumn id = IntColumn("id");
+  IntColumn version = IntColumn("version");
+  BoolColumn deleted = BoolColumn("deleted");
+  DateTimeColumn createdAt = DateTimeColumn("createdAt");
+  DateTimeColumn updatedAt = DateTimeColumn("updatedAt");
+  StringColumn createdBy = StringColumn("createdBy");
+  StringColumn lastUpdatedBy = StringColumn("lastUpdatedBy");
+  StringColumn remark = StringColumn("remark");
+
+  List get columns => [
+        id,
+        version,
+        deleted,
+        createdAt,
+        updatedAt,
+        createdBy,
+        lastUpdatedBy,
+        remark
+      ];
 }
 
 abstract class BaseModel extends __Model {
@@ -436,9 +471,17 @@ abstract class BaseModel extends __Model {
   }
 }
 
-class BookModelQuery extends _BaseModelQuery<Book, int> {
+class BookModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'Book';
+
+  BookModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+
+  StringColumn name = StringColumn("name");
+  DoubleColumn price = DoubleColumn("price");
+  UserModelQuery get author => topQuery.findQuery("User");
+
+  List get columns => [name, price, author];
 }
 
 class Book extends BaseModel {
@@ -532,9 +575,18 @@ class Book extends BaseModel {
   }
 }
 
-class UserModelQuery extends _BaseModelQuery<User, int> {
+class UserModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'User';
+
+  UserModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+
+  StringColumn name = StringColumn("name");
+  StringColumn loginName = StringColumn("loginName");
+  StringColumn address = StringColumn("address");
+  IntColumn age = IntColumn("age");
+
+  List get columns => [name, loginName, address, age];
 }
 
 class User extends BaseModel {
@@ -631,9 +683,15 @@ class User extends BaseModel {
   }
 }
 
-class JobModelQuery extends _BaseModelQuery<Job, int> {
+class JobModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'Job';
+
+  JobModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+
+  StringColumn name = StringColumn("name");
+
+  List get columns => [name];
 }
 
 class Job extends BaseModel {

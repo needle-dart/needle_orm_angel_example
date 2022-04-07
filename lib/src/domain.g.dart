@@ -93,17 +93,18 @@ abstract class __Model extends Model {
 
 abstract class _BaseModelQuery<T extends __Model, D>
     extends BaseModelQuery<T, D> {
-  _BaseModelQuery({BaseModelQuery? topQuery})
-      : super(sqlExecutor, topQuery: topQuery);
+  _BaseModelQuery({BaseModelQuery? topQuery, String? propName})
+      : super(_modelInspector, sqlExecutor,
+            topQuery: topQuery, propName: propName);
 
-  BaseModelQuery createQuery(String name) {
+  BaseModelQuery createQuery(String name, String propName) {
     switch (name) {
       case 'Book':
-        return BookModelQuery(topQuery: this);
+        return BookModelQuery(topQuery: this, propName: propName);
       case 'User':
-        return UserModelQuery(topQuery: this);
+        return UserModelQuery(topQuery: this, propName: propName);
       case 'Job':
-        return JobModelQuery(topQuery: this);
+        return JobModelQuery(topQuery: this, propName: propName);
     }
     throw 'Unknow Query Name: $name';
   }
@@ -301,7 +302,8 @@ class BaseModelModelQuery extends _BaseModelQuery<BaseModel, int> {
   @override
   String get className => 'BaseModel';
 
-  BaseModelModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+  BaseModelModelQuery({_BaseModelQuery? topQuery, String? propName})
+      : super(topQuery: topQuery, propName: propName);
 
   IntColumn id = IntColumn("id");
   IntColumn version = IntColumn("version");
@@ -312,7 +314,7 @@ class BaseModelModelQuery extends _BaseModelQuery<BaseModel, int> {
   StringColumn lastUpdatedBy = StringColumn("lastUpdatedBy");
   StringColumn remark = StringColumn("remark");
 
-  List get columns => [
+  List<ColumnQuery> get columns => [
         id,
         version,
         deleted,
@@ -322,6 +324,8 @@ class BaseModelModelQuery extends _BaseModelQuery<BaseModel, int> {
         lastUpdatedBy,
         remark
       ];
+
+  List<BaseModelQuery> get joins => [];
 }
 
 abstract class BaseModel extends __Model {
@@ -475,13 +479,16 @@ class BookModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'Book';
 
-  BookModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+  BookModelQuery({_BaseModelQuery? topQuery, String? propName})
+      : super(topQuery: topQuery, propName: propName);
 
   StringColumn name = StringColumn("name");
   DoubleColumn price = DoubleColumn("price");
-  UserModelQuery get author => topQuery.findQuery("User");
+  UserModelQuery get author => topQuery.findQuery("User", "author");
 
-  List get columns => [name, price, author];
+  List<ColumnQuery> get columns => [name, price];
+
+  List<BaseModelQuery> get joins => [author];
 }
 
 class Book extends BaseModel {
@@ -549,7 +556,7 @@ class Book extends BaseModel {
     return {
       "name": _name,
       "price": _price,
-      "author": _author,
+      "author": _author?.toMap(),
       ...super.toMap(),
     };
   }
@@ -579,14 +586,17 @@ class UserModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'User';
 
-  UserModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+  UserModelQuery({_BaseModelQuery? topQuery, String? propName})
+      : super(topQuery: topQuery, propName: propName);
 
   StringColumn name = StringColumn("name");
   StringColumn loginName = StringColumn("loginName");
   StringColumn address = StringColumn("address");
   IntColumn age = IntColumn("age");
 
-  List get columns => [name, loginName, address, age];
+  List<ColumnQuery> get columns => [name, loginName, address, age];
+
+  List<BaseModelQuery> get joins => [];
 }
 
 class User extends BaseModel {
@@ -687,11 +697,14 @@ class JobModelQuery extends BaseModelModelQuery {
   @override
   String get className => 'Job';
 
-  JobModelQuery({_BaseModelQuery? topQuery}) : super(topQuery: topQuery);
+  JobModelQuery({_BaseModelQuery? topQuery, String? propName})
+      : super(topQuery: topQuery, propName: propName);
 
   StringColumn name = StringColumn("name");
 
-  List get columns => [name];
+  List<ColumnQuery> get columns => [name];
+
+  List<BaseModelQuery> get joins => [];
 }
 
 class Job extends BaseModel {
@@ -761,7 +774,7 @@ class BookMigration extends Migration {
 
       table.float('price');
 
-      table.varChar('author');
+      table.integer('author_id');
 
       table.serial('id');
 

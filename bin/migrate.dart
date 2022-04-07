@@ -23,6 +23,7 @@ void main(List<String> args) async {
   var connection = await connectToPostgres(configuration);
   var migrationRunner = PostgresMigrationRunner(connection, migrations: [
     BookMigration(),
+    UserMigration(),
   ]);
   await runMigrations(migrationRunner, args);
 }

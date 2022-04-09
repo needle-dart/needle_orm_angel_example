@@ -91,29 +91,9 @@ AngelConfigurer configureServer(FileSystem fileSystem) {
 
     app.get('/books', (req, res) async {
       var books = await runWithDs(req, () {
-        return Book.Query.findAll();
+        return Book.Query.findList();
       });
       return books.map((e) => e.toMap()).toList();
-    });
-
-    app.get('/booktest2', (req, res) async {
-      return await runWithDs(req, () {
-        return [
-          (Book()
-                ..name = 'Name'
-                ..price = 12.34)
-              .toMap()
-        ];
-      });
-    });
-
-    app.get('/booktest3', (req, res) async {
-      return [
-        (Book()
-              ..name = 'Name'
-              ..price = 12.34)
-            .toMap()
-      ];
     });
 
     // Mount static server at web in development.
